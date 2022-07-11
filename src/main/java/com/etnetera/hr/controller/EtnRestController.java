@@ -30,4 +30,11 @@ public abstract class EtnRestController {
 		return ResponseEntity.badRequest().body(errors);
 	}
 
+	@ExceptionHandler(ValidationError.class)
+	public ResponseEntity<Errors> handleValidationException(ValidationError ex) {
+		Errors errors = new Errors();
+		errors.setErrors(List.of(ex));
+		return ResponseEntity.badRequest().body(errors);
+	}
+
 }

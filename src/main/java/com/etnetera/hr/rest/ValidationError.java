@@ -7,7 +7,7 @@ package com.etnetera.hr.rest;
  * @author Etnetera
  *
  */
-public class ValidationError {
+public class ValidationError extends Throwable {
 
 	private String field;
 	private String message;
