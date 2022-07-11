@@ -111,6 +111,24 @@ public class JavaScriptFrameworkTests {
 				.andExpect(jsonPath("$.errors", hasSize(1)))
 				.andExpect(jsonPath("$.errors[0].field", is("id")))
 				.andExpect(jsonPath("$.errors[0].message", is("DoesNotExist")));
+
+		mockMvc.perform(delete("/frameworks/notanumber"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.errors", hasSize(1)))
+				.andExpect(jsonPath("$.errors[0].field", is("id")))
+				.andExpect(jsonPath("$.errors[0].message", is("NotANumber")));
+	}
+
+	@Test
+	public void deleteValid() throws JsonProcessingException, Exception {
+		JavaScriptFramework framework = new JavaScriptFramework("Preact");
+		framework.setId(10L);
+		repository.save(framework);
+		framework = repository.findAll().iterator().next();
+		assert repository.existsById(framework.getId());
+		mockMvc.perform(delete("/frameworks/" + framework.getId()))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.name", is(framework.getName())));
 	}
 	
 }
