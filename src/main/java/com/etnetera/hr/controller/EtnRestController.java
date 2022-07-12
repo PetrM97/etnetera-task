@@ -3,6 +3,7 @@ package com.etnetera.hr.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -34,6 +35,13 @@ public abstract class EtnRestController {
 	public ResponseEntity<Errors> handleValidationException(ValidationError ex) {
 		Errors errors = new Errors();
 		errors.setErrors(List.of(ex));
+		return ResponseEntity.badRequest().body(errors);
+	}
+
+	@ExceptionHandler(JsonParseException.class)
+	public ResponseEntity<Errors> handleJsonParseException(JsonParseException ex) {
+		Errors errors = new Errors();
+		errors.setErrors(List.of(new ValidationError("", "JsonParseException")));
 		return ResponseEntity.badRequest().body(errors);
 	}
 

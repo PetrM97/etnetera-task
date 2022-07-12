@@ -23,6 +23,9 @@ import com.etnetera.hr.repository.JavaScriptFrameworkRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.sql.Date;
+import java.time.LocalDate;
+
 
 /**
  * Class used for Spring Boot/MVC based tests.
@@ -74,7 +77,56 @@ public class JavaScriptFrameworkTests {
 				.andExpect(status().isOk()) // Insert returns the newly created record
 				.andExpect(jsonPath("$.name", is(framework.getName())))
 				.andExpect(jsonPath("$.id", Matchers.anything()));
+	}
 
+	@Test
+	public void addFrameworkAllProps() throws JsonProcessingException, Exception {
+		JavaScriptFramework framework = new JavaScriptFramework("Vanilla.js");
+		framework.setVersion("1.0.0-dev");
+		framework.setDeprecationDate(Date.valueOf(LocalDate.MAX));
+		framework.setHypeLevel(10);
+		mockMvc.perform(post("/frameworks").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsBytes(framework)))
+				.andExpect(status().isOk()) // Insert returns the newly created record
+				.andExpect(jsonPath("$.name", is(framework.getName())))
+				.andExpect(jsonPath("$.id", Matchers.anything()))
+				.andExpect(jsonPath("$.hypeLevel", is(framework.getHypeLevel())))
+				.andExpect(jsonPath("$.deprecationDate", is(framework.getDeprecationDate().toString())));
+	}
+
+	@Test
+	public void addFrameworkInvalidVersion() throws JsonProcessingException, Exception {
+		JavaScriptFramework framework = new JavaScriptFramework("Vanilla.js");
+		framework.setVersion("1.0.0.1");
+		mockMvc.perform(post("/frameworks").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsBytes(framework)))
+				.andExpect(status().isBadRequest()) // Insert returns the newly created record
+				.andExpect(jsonPath("$.errors", hasSize(1)))
+				.andExpect(jsonPath("$.errors[0].field", is("version")))
+				.andExpect(jsonPath("$.errors[0].message", is("Pattern")));
+	}
+
+	@Test
+	public void addFrameworkInvalidHypeLevel() throws JsonProcessingException, Exception {
+		JavaScriptFramework framework = new JavaScriptFramework("Vanilla.js");
+		framework.setHypeLevel(11);
+		mockMvc.perform(post("/frameworks").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsBytes(framework)))
+				.andExpect(status().isBadRequest()) // Insert returns the newly created record
+				.andExpect(jsonPath("$.errors", hasSize(1)))
+				.andExpect(jsonPath("$.errors[0].field", is("hypeLevel")))
+				.andExpect(jsonPath("$.errors[0].message", is("Range")));
+	}
+
+	/*
+		If the date cannot be parsed (i.e. is invalid), it is set to be null.
+		Therefore, there is no unit test for an invalid date.
+	 */
+
+	@Test
+	public void addFrameworkInvalidJson() throws JsonProcessingException, Exception {
+		mockMvc.perform(post("/frameworks").contentType(MediaType.APPLICATION_JSON).content("{\"name\": neverGonna}"))
+				.andExpect(status().isBadRequest()) // Insert returns the newly created record
+				.andExpect(jsonPath("$.errors", hasSize(1)))
+				.andExpect(jsonPath("$.errors[0].field", is("")))
+				.andExpect(jsonPath("$.errors[0].message", is("JsonParseException")));
 	}
 	
 	@Test
@@ -110,7 +162,6 @@ public class JavaScriptFrameworkTests {
 				.andExpect(jsonPath("$.errors", hasSize(1)))
 				.andExpect(jsonPath("$.errors[0].field", is("id")))
 				.andExpect(jsonPath("$.errors[0].message", is("AlreadyExists")));
-		
 	}
 
 	@Test

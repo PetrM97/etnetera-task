@@ -2,11 +2,16 @@
 
 ## Features
 
-- [ ] Framework - version
-- [ ] Framework - deprecationDate
-- [ ] Framework - hypeLevel
+- [x] Framework - version
+- [x] Framework - deprecationDate
+- [x] Framework - hypeLevel
 - [x] REST - Add new framework
 - [ ] REST - Modify existing framework
 - [x] REST - Remove framework
 - [ ] REST - Framework search
-- [ ] Unit tests
+- [x] Unit tests
+
+## Extensions
+
+- Spring Validation
+- Lombok

@@ -1,5 +1,9 @@
 package com.etnetera.hr.data;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.validator.constraints.Range;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +18,8 @@ import java.sql.Date;
  * @author Etnetera
  *
  */
+@Getter
+@Setter
 @Entity
 public class JavaScriptFramework {
 
@@ -23,44 +29,27 @@ public class JavaScriptFramework {
 
 	@Column(nullable = false, length = 30)
 	@NotEmpty(message = "NotEmpty")
-	@Size(max = 30, message = "Size")
+	@Size(max = 30)
 	private String name;
 
 	@Column(nullable = true, length = 30)
-	@Size(max = 30, message = "Size")
+	@Size(max = 30)
 	// Regex for semantic versioning,
 	// taken from: https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-	@Pattern(regexp = "/^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$/")
+	@Pattern(regexp = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$")
 	private String version;
 
 	@Column(nullable = true)
 	private Date deprecationDate;
 
 	@Column(nullable = true)
-	@Min(0)
-	@Max(10)
+	@Range(min = 0, max = 10)
 	private int hypeLevel;
 
 	public JavaScriptFramework() {
 	}
 
 	public JavaScriptFramework(String name) {
-		this.name = name;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
 		this.name = name;
 	}
 
