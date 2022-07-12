@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-//@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class JavaScriptFrameworkTests {
 
 	@Autowired
@@ -77,25 +78,33 @@ public class JavaScriptFrameworkTests {
 	}
 	
 	@Test
-	public void addFrameworkInvalid() throws JsonProcessingException, Exception {
+	public void addFrameworkNull() throws JsonProcessingException, Exception {
 		JavaScriptFramework framework = new JavaScriptFramework();
 		mockMvc.perform(post("/frameworks").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsBytes(framework)))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.errors", hasSize(1)))
 				.andExpect(jsonPath("$.errors[0].field", is("name")))
 				.andExpect(jsonPath("$.errors[0].message", is("NotEmpty")));
-		
-		framework.setName("verylongnameofthejavascriptframeworkjavaisthebest");
-		mockMvc.perform(post("/frameworks").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsBytes(framework)))
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.errors", hasSize(1)))
-			.andExpect(jsonPath("$.errors[0].field", is("name")))
-			.andExpect(jsonPath("$.errors[0].message", is("Size")));
+	}
 
+	@Test
+	public void addFrameworkLongName() throws JsonProcessingException, Exception {
+		JavaScriptFramework framework = new JavaScriptFramework("verylongnameofthejavascriptframeworkjavaisthebest");
+		mockMvc.perform(post("/frameworks").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsBytes(framework)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.errors", hasSize(1)))
+				.andExpect(jsonPath("$.errors[0].field", is("name")))
+				.andExpect(jsonPath("$.errors[0].message", is("Size")));
+	}
+
+	@Test
+	public void addFrameworkDuplicate() throws JsonProcessingException, Exception {
 		// Save the framework and then try to add it again with the same ID
-		framework.setName("validName");
+		JavaScriptFramework framework = new JavaScriptFramework("validName");
 		framework.setId(1L);
 		repository.save(framework);
+		// ID may not be 1 due to other tests
+		framework = repository.findAll().iterator().next();
 		mockMvc.perform(post("/frameworks").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsBytes(framework)))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.errors", hasSize(1)))
