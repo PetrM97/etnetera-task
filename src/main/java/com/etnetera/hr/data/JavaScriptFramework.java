@@ -6,11 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.validator.constraints.Range;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.sql.Date;
 
@@ -25,6 +21,7 @@ import java.sql.Date;
 @EqualsAndHashCode
 @ToString
 @Entity
+@Table(name = "javascriptframework")
 public class JavaScriptFramework {
 
 	@Id
@@ -43,10 +40,10 @@ public class JavaScriptFramework {
 	@Pattern(regexp = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$")
 	private String version;
 
-	@Column(nullable = true)
+	@Column(nullable = true, name = "deprecation_date")
 	private Date deprecationDate;
 
-	@Column(nullable = true)
+	@Column(nullable = true, name = "hype_level")
 	@Range(min = 0, max = 10)
 	private int hypeLevel;
 

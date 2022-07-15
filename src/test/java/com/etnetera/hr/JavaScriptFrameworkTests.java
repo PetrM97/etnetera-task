@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,11 @@ public class JavaScriptFrameworkTests {
 
 	@Autowired
 	private JavaScriptFrameworkRepository repository;
+
+	@Before
+	public void before(){
+		repository.deleteAll();
+	}
 
 	private void prepareData() throws Exception {
 		// Start with clean repository - the order of test cases can be arbitrary

@@ -17,3 +17,4 @@
 
 - Spring Validation
 - Lombok
+- `data.sql` file for creating a populated database of frameworks
