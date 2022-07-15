@@ -3,22 +3,20 @@ package com.etnetera.hr.rest;
 import java.util.List;
 
 /**
- * 
  * Envelope for the validation errors. Represents JSON response.
- * 
- * @author Etnetera
  *
+ * @author Etnetera
  */
 public class Errors {
 
-	private List<ValidationError> errors;
+    private List<ValidationError> errors;
 
-	public List<ValidationError> getErrors() {
-		return errors;
-	}
+    public List<ValidationError> getErrors() {
+        return errors;
+    }
 
-	public void setErrors(List<ValidationError> errors) {
-		this.errors = errors;
-	}
+    public void setErrors(List<ValidationError> errors) {
+        this.errors = errors;
+    }
 
 }
