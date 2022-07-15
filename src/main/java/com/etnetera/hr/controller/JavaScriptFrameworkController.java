@@ -32,6 +32,12 @@ public class JavaScriptFrameworkController extends EtnRestController {
 		return repository.findAll();
 	}
 
+	@GetMapping("/frameworks/{idString}")
+	public JavaScriptFramework frameworks(@PathVariable String idString) throws ValidationError {
+		long id = stringToIdOrThrow(idString);
+		return repository.findById(id).orElseThrow(() -> new ValidationError("id", "NotFound"));
+	}
+
 	@PostMapping("/frameworks")
 	public JavaScriptFramework frameworkAdd(@RequestBody @Valid JavaScriptFramework framework) throws ValidationError {
 		if(framework.getId() != null && repository.existsById(framework.getId())) throw new ValidationError("id", "AlreadyExists");
@@ -39,17 +45,36 @@ public class JavaScriptFrameworkController extends EtnRestController {
 		return framework;
 	}
 
+	@PostMapping("/frameworks/{idString}")
+	public JavaScriptFramework frameworkUpdate(@RequestBody @Valid JavaScriptFramework framework, @PathVariable String idString) throws ValidationError {
+		long id = stringToIdOrThrow(idString);
+		if(!repository.existsById(id)) throw new ValidationError("id", "NotFound");
+		JavaScriptFramework frameworkRepo = repository.findById(id).get();
+		frameworkRepo.setName(framework.getName());
+		frameworkRepo.setVersion(framework.getVersion());
+		frameworkRepo.setHypeLevel(framework.getHypeLevel());
+		frameworkRepo.setDeprecationDate(framework.getDeprecationDate());
+		repository.save(frameworkRepo);
+		return framework;
+	}
+
 	@DeleteMapping("/frameworks/{idString}")
 	public JavaScriptFramework frameworkDelete(@PathVariable String idString) throws ValidationError {
+		long id = stringToIdOrThrow(idString);
+		JavaScriptFramework framework = repository.findById(id).orElseThrow(() -> new ValidationError("id", "NotFound"));
+		repository.delete(framework);
+		return framework;
+	}
+
+
+	private long stringToIdOrThrow(String idString) throws ValidationError {
 		long id;
 		try {
 			id = Long.parseLong(idString);
 		}catch (NumberFormatException ex){
 			throw new ValidationError("id", "NotANumber");
 		}
-		JavaScriptFramework framework = repository.findById(id).orElseThrow(() -> new ValidationError("id", "DoesNotExist"));
-		repository.delete(framework);
-		return framework;
+		return id;
 	}
 
 }

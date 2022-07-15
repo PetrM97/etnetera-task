@@ -1,7 +1,9 @@
 package com.etnetera.hr.data;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.Column;
@@ -20,6 +22,8 @@ import java.sql.Date;
  */
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 @Entity
 public class JavaScriptFramework {
 
@@ -51,11 +55,6 @@ public class JavaScriptFramework {
 
 	public JavaScriptFramework(String name) {
 		this.name = name;
-	}
-
-	@Override
-	public String toString() {
-		return "JavaScriptFramework [id=" + id + ", name=" + name + "]";
 	}
 
 }

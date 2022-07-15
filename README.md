@@ -6,9 +6,11 @@
 - [x] Framework - deprecationDate
 - [x] Framework - hypeLevel
 - [x] REST - Add new framework
-- [ ] REST - Modify existing framework
+- [x] REST - Modify existing framework
 - [x] REST - Remove framework
-- [ ] REST - Framework search
+- [x] REST - Framework search
+  - Search done only by ID
+  - Specification of the search functionality should be refined (e.g., search by exact name, fuzzy search, combination of multiple properties)
 - [x] Unit tests
 
 ## Extensions

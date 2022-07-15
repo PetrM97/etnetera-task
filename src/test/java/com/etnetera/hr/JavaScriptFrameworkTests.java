@@ -22,6 +22,7 @@ import com.etnetera.hr.data.JavaScriptFramework;
 import com.etnetera.hr.repository.JavaScriptFrameworkRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -150,6 +151,27 @@ public class JavaScriptFrameworkTests {
 	}
 
 	@Test
+	public void getFramework() throws JsonProcessingException, Exception {
+		prepareData();
+		JavaScriptFramework framework = repository.findAll().iterator().next();
+		// ID may not be 1 due to other tests
+		framework = repository.findAll().iterator().next();
+		mockMvc.perform(get("/frameworks/" + framework.getId()))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(framework.getId().intValue())))
+				.andExpect(jsonPath("$.name", is(framework.getName())));
+	}
+
+	@Test
+	public void getFrameworkInvalid() throws JsonProcessingException, Exception {
+		mockMvc.perform(get("/frameworks/1000"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.errors", hasSize(1)))
+				.andExpect(jsonPath("$.errors[0].field", is("id")))
+				.andExpect(jsonPath("$.errors[0].message", is("NotFound")));
+	}
+
+	@Test
 	public void addFrameworkDuplicate() throws JsonProcessingException, Exception {
 		// Save the framework and then try to add it again with the same ID
 		JavaScriptFramework framework = new JavaScriptFramework("validName");
@@ -165,12 +187,34 @@ public class JavaScriptFrameworkTests {
 	}
 
 	@Test
+	public void modifyFramework() throws JsonProcessingException, Exception {
+		prepareData();
+		JavaScriptFramework framework = repository.findAll().iterator().next();
+		// ID may not be 1 due to other tests
+		framework = repository.findAll().iterator().next();
+		framework.setName("Nothing");
+		framework.setVersion("2.1.0-dev");
+		framework.setDeprecationDate(Date.valueOf(LocalDate.now()));
+		framework.setHypeLevel(9);
+		// By modifying a framework, the number of records must remain the same
+		long initialCount = repository.count();
+		mockMvc.perform(post("/frameworks/" + framework.getId()).contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsBytes(framework)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.name", is(framework.getName())))
+				.andExpect(jsonPath("$.version", is(framework.getVersion())))
+				.andExpect(jsonPath("$.hypeLevel", is(framework.getHypeLevel())))
+				.andExpect(jsonPath("$.deprecationDate", is(framework.getDeprecationDate().toString())));
+		// ID of the framework is not checked as it is assigned by the database
+		assert initialCount == repository.count();
+	}
+
+	@Test
 	public void deleteInvalid() throws JsonProcessingException, Exception {
 		mockMvc.perform(delete("/frameworks/-1"))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.errors", hasSize(1)))
 				.andExpect(jsonPath("$.errors[0].field", is("id")))
-				.andExpect(jsonPath("$.errors[0].message", is("DoesNotExist")));
+				.andExpect(jsonPath("$.errors[0].message", is("NotFound")));
 
 		mockMvc.perform(delete("/frameworks/notanumber"))
 				.andExpect(status().isBadRequest())
